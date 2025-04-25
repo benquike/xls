@@ -1,0 +1,17 @@
+name: C++ Style Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run cpplint
+        uses: cpplint/cpplint-action@latest
+        with:
+          filter: '-whitespace/line_length' # Example: Exclude line length checks
