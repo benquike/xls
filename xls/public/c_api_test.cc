@@ -617,6 +617,20 @@ fn f(x: bits[32] id=3) -> bits[32] {
       << "xls_parse_ir_package error: " << error;
   absl::Cleanup free_package([package] { xls_package_free(package); });
 
+
+  struct xls_function** functions = nullptr;
+  size_t function_count = 0;
+  char *function_name = nullptr;
+  ASSERT_TRUE(xls_package_get_functions(package, &error, &functions,
+                                         &function_count));
+  absl::Cleanup free_function_array_and_function_name([&functions, &function_name] {
+    xls_function_ptr_array_free(functions);
+    xls_c_str_free(function_name);
+  });
+  ASSERT_EQ(function_count, 1);
+  ASSERT_TRUE(xls_function_get_name(functions[0], &error, &function_name));
+  EXPECT_EQ(std::string_view(function_name), "f");
+
   char* dumped = nullptr;
   ASSERT_TRUE(xls_package_to_string(package, &dumped));
   absl::Cleanup free_dumped([dumped] { xls_c_str_free(dumped); });
